@@ -1,0 +1,9 @@
+## Interface: 80000
+## Title: |cff9004e8Quotable|r
+## Author: Dorventh-WyrmrestAccord
+## Version: 0.0.1
+## X-Minor-Version: 1
+## Notes: Look it's an addon
+## X-Category: Chat/Communication
+
+Quotable.lua
