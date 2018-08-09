@@ -1,11 +1,14 @@
 ## Interface: 80000
 ## Version: v8.0.3
 ## Title: |cff9004e8Quotable|r
-## Author: Dorventh-WyrmrestAccord
+## Author: Dorventh-WyrmrestAccord and Dominia-WyrmrestAccord
 ## Version: 0.0.1
 ## X-Minor-Version: 1
 ## Notes: Look it's an addon
 ## X-Category: Chat/Communication
 ## SavedVariables: QuotableDB
+## OptionalDeps: Ace3
+## X-Embeds: Ace3
 
-Quotable.lua
+embeds.xml
+Core.lua
