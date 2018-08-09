@@ -77,7 +77,14 @@ function Quotable.Command(cmd)
     -- Handle commands
     if(#msgArgs == 0) then
         Quotable.DisplayHelp();
-
+    elseif(msgArgs[1] == 'add') then
+        Quotable.AddQuote();
+    elseif(msgArgs[1] == 'remove') then
+        Quotable.RemoveQuote();
+    elseif(msgArgs[1] == 'speak') then
+        Quotable.SpeakQuote();
+    else
+        Quotable.DisplayHelp();
     end
 
 end
@@ -89,6 +96,17 @@ end
 function Quotable.DisplayHelp()
     Quotable.Print('--- Quotable Help ---');
     --TODO tony Add more help lmao
+end
+
+function Quotable.AddQuote()
+
+end
+
+function Quotable.RemoveQuote()
+
+end
+
+function Quotable.SpeakQuote()
 end
 
 
