@@ -37,10 +37,60 @@ Quotable:RegisterEvent('PLAYER_LOGIN');
 
 Quotable.OnEvent = function(self, event, ...)
     if event == 'PLAYER_LOGIN' then
-        Quotable.Print('hello world');
+        Quotable.Init();
     end
 end
 Quotable:SetScript("OnEvent", Quotable.OnEvent);
+
+----------------------------------------------------------------------------
+-- Initialize the addon
+----------------------------------------------------------------------------
+function Quotable.Init()
+    -- Register Slash Command
+    SLASH_QUOTABLE1 = "/quote";
+    SLASH_QUOTABLE2 = "/quotable";
+    SlashCmdList['QUOTABLE'] = Quotable.Command;
+
+    Quotable.Print("Welcome to Quotable! /quote or /quotable to use.");
+end
+
+---------------------------------------------------------------------------
+-- HANDLERS
+----------------------------------------------------------------------------
+
+----------------------------------------------------------------------------
+-- Command handler
+----------------------------------------------------------------------------
+
+function Quotable.Command(cmd)
+    --Create variables
+    local msgArgs = {};
+
+    --convert to lower case
+    cmd = string.lower(cmd);
+
+    --separate args
+    for value in string.gmatch(cmd, "[^ ]+") do
+        table.insert(msgArgs, value);
+    end
+
+    -- Handle commands
+    if(#msgArgs == 0) then
+        Quotable.DisplayHelp();
+
+    end
+
+end
+
+----------------------------------------------------------------------------
+-- Chat command handlers
+----------------------------------------------------------------------------
+
+function Quotable.DisplayHelp()
+    Quotable.Print('--- Quotable Help ---');
+    --TODO tony Add more help lmao
+end
+
 
 ----------------------------------------------------------------------------
 -- UTILITY FUNCTIONS
@@ -64,7 +114,3 @@ function Quotable.PrintDebug(msg)
     msg = "(Debug) " .. msg;
     if QT_Debug then Quotable.Print(msg); end
 end
-
--- a comment
-
-
