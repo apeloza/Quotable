@@ -18,13 +18,30 @@ local options = {
 function Quotable:OnEnable()
     Quotable:Print("Welcome to Quotable! /quote or /quotable to use.");
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Quotable", options, {"quotable", "quote"})
+    -- declare defaults to be used in the DB
+
     Quotable.message = 'A test message';
     Quotable.Speak();
 
 end
 
+function Quotable:OnInitialize()
+    local defaults = {
+        global = {
+            quotes = {'This is a test quote', 'This is a second test quote'},
+        }
+    }
+    -- Assuming the .toc says ## SavedVariables: QuotableDB
+    Quotable.db = LibStub("AceDB-3.0"):New("QuotableDB", defaults, true);
+end
+
 function Quotable:Speak(info)
-    Quotable:Print('woopdidy scoop');
+    Quotable:Print(Quotable.Random());
+end
+
+function Quotable:Random()
+    local number = math.random(#Quotable.db.global.quotes);
+    return Quotable.db.global.quotes[number];
 end
 
 function Quotable:Save(info, newValue)
