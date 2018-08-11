@@ -1,5 +1,5 @@
 -- Create a new Ace3 module
-Quotable = LibStub("AceAddon-3.0"):NewAddon("Quotable", "AceConsole-3.0", "AceEvent-3.0");
+Quotable = LibStub("AceAddon-3.0"):NewAddon("Quotable", "AceConsole-3.0", "AceEvent-3.0", "AceComm-3.0");
 
 local options = {
     name = "Quotable",
@@ -18,6 +18,13 @@ local options = {
             desc = "Saves a new quote to the database.",
             get="Save",
             set="Save"
+        },
+        output = {
+            type="input",
+            name="Output",
+            desc = "Sets the output channel for Quotable (default party).",
+            get="SetOutput",
+            set="SetOutput",
         }
     },
 }
@@ -27,23 +34,21 @@ function Quotable:OnEnable()
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Quotable", options, {"quotable", "quote"})
     -- declare defaults to be used in the DB
 
-    Quotable.message = 'A test message';
-    Quotable.Speak();
-
 end
 
 function Quotable:OnInitialize()
     local defaults = {
         global = {
             quotes = {'This is a test quote', 'This is a second test quote'},
-        }
+            channel = 'PARTY',
+        },
     }
     -- Assuming the .toc says ## SavedVariables: QuotableDB
     Quotable.db = LibStub("AceDB-3.0"):New("QuotableDB", defaults, true);
 end
 
 function Quotable:Speak(info)
-    Quotable:Print(Quotable.Random());
+    SendChatMessage("QUOTABLE: " .. Quotable.Random(), Quotable.db.global.channel);
 end
 
 function Quotable:Random()
@@ -53,4 +58,8 @@ end
 
 function Quotable:Save(info, newValue)
     Quotable.db.global.quotes[#Quotable.db.global.quotes + 1] = newValue;
+end
+
+function Quotable:SetOutput(info, newValue)
+    Quotable.db.global.channel = newValue;
 end
