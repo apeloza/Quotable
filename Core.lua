@@ -25,6 +25,12 @@ local options = {
             desc = "Sets the output channel for Quotable (default party).",
             get="SetOutput",
             set="SetOutput",
+        },
+        eraseall = {
+            type="execute",
+            name="Erase All",
+            desc = "Erases ALL quotes in the database (WARNING: permanent!)",
+            func="EraseAll",
         }
     },
 }
@@ -39,7 +45,7 @@ end
 function Quotable:OnInitialize()
     local defaults = {
         global = {
-            quotes = {'This is a test quote', 'This is a second test quote'},
+            quotes = {},
             channel = 'PARTY',
         },
     }
@@ -48,9 +54,14 @@ function Quotable:OnInitialize()
 end
 
 function Quotable:Speak(info)
-    SendChatMessage("QUOTABLE: " .. Quotable.Random(), Quotable.db.global.channel);
+    if(#Quotable.db.global.quotes ~= 0) then
+        SendChatMessage("QUOTABLE: " .. Quotable.Random(), Quotable.db.global.channel);
+    else
+        Quotable:Print('ERROR: No quotes are in the database. Use /quote save to add quotes!');
+    end
 end
 
+--Returns a random quote from the quote DB
 function Quotable:Random()
     local number = math.random(#Quotable.db.global.quotes);
     return Quotable.db.global.quotes[number];
@@ -62,4 +73,9 @@ end
 
 function Quotable:SetOutput(info, newValue)
     Quotable.db.global.channel = newValue;
+end
+
+--DESTRUCTIVE
+function Quotable:EraseAll(info)
+    Quotable.db.global.quotes = {};
 end
