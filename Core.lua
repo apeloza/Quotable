@@ -33,6 +33,12 @@ local options = {
             name="Erase All",
             desc = "Erases ALL quotes in the database (WARNING: permanent!)",
             func="EraseAll",
+        },
+        list = {
+            type="execute",
+            name="List Quotes",
+            desc = "Lists all quotes by name",
+            func="ListQuotes"
         }
     },
 }
@@ -139,6 +145,14 @@ end
 
 function Quotable:SetOutput(info, newValue)
     Quotable.db.global.channel = newValue;
+end
+
+function Quotable:ListQuotes(info)
+    local quote_list = {}
+    for i in pairs(Quotable.db.global.quotes) do
+        table.insert(quote_list, Quotable.db.global.quotes[i].name)
+    end
+    Quotable:Print(table.concat(quote_list, ", "))
 end
 
 --DESTRUCTIVE
