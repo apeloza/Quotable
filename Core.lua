@@ -12,6 +12,13 @@ local options = {
             desc = "Outputs a random quote.",
             func = "Speak"
         },
+        save = {
+            type="input",
+            name="Save",
+            desc = "Saves a new quote to the database.",
+            get="Save",
+            set="Save"
+        }
     },
 }
 
@@ -45,5 +52,5 @@ function Quotable:Random()
 end
 
 function Quotable:Save(info, newValue)
-    self.message = newValue
+    Quotable.db.global.quotes[#Quotable.db.global.quotes + 1] = newValue;
 end
