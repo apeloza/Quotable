@@ -69,34 +69,7 @@ function Quotable:OnInitialize()
             position = 'CENTER',
             xOfs = 0,
             yOfs = 0,
-            quotes = {
-                {
-                    name = "Tigers",
-                    quote = "Oh no I thought we were going to the sandbox tigers",
-                    author = "Rom",
-                    date = 8/8/2018,
-                    tags = { "DMF" }
-                },
-                {
-                    name = "Loops",
-                    quote = "Brother may I have some loops",
-                    tags = { "meme" },
-                    date = 2018
-                },
-                {
-                    name = "Floor Pasta",
-                    quote = "Just serve them the floor pasta",
-                    author = "Tony",
-                    date = 8/9/2018,
-                    tags = { "Overcooked" }
-                },
-                {
-                    name = "Desolate Gays",
-                    quote = "Watch out for the gays",
-                    author = "Tony",
-                    tags = { "raid", "guild" }
-                }
-            },
+            quotes = {},
         }
     }
     -- Assuming the .toc says ## SavedVariables: QuotableDB
@@ -105,7 +78,21 @@ end
 
 function Quotable:Speak(info)
     if(#Quotable.db.global.quotes ~= 0) then
-        SendChatMessage("QUOTABLE: " .. Quotable.Random(), Quotable.db.global.channel);
+        local quote = Quotable.Random()
+        local format = ""
+
+        if quote.author and quote.date then
+            format = "\"{quote}\" - {author}, {date}"
+        elseif quote.author then
+            format = "\"{quote}\" - {author}"
+        elseif quote.date then
+            format = "\"{quote}\" - {date}"
+        else
+            format = "\"{quote}\""
+        end
+
+        local formatted_quote = replace_vars(format, quote)
+        SendChatMessage(formatted_quote, Quotable.db.global.channel);
     else
         Quotable:Print('ERROR: No quotes are in the database. Use /quote save to add quotes!');
     end
@@ -114,7 +101,7 @@ end
 --Returns a random quote from the quote DB
 function Quotable:Random()
     local number = math.random(#Quotable.db.global.quotes);
-    return Quotable.db.global.quotes[number].quote;
+    return Quotable.db.global.quotes[number];
 end
 
 function Quotable:Save(info, input)
@@ -408,4 +395,20 @@ function Quotable:ManageQuotesOpenWindow()
 
     f:AddChild(header_container)
     f:AddChild(scroll_container)
+end
+
+------------------------
+--- UTILITY FUNCTIONS
+------------------------
+
+function replace_vars(str, vars)
+    -- Allow replace_vars{str, vars} syntax as well as replace_vars(str, {vars})
+    if not vars then
+        vars = str
+        str = vars[1]
+    end
+    return (string.gsub(str, "({([^}]+)})",
+        function(whole,i)
+            return vars[i] or whole
+        end))
 end
