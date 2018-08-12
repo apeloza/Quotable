@@ -269,7 +269,7 @@ function Quotable:NewQuoteOpenWindow()
     local submit = AceGUI:Create("Button")
     submit:SetText("Save")
     submit:SetWidth(200)
-
+    submit:SetCallback("OnClick", Quotable.NewQuoteSubmit)
     f:AddChild(submit)
 
     Quotable.add_form.input_quote = input_quote;
@@ -287,5 +287,11 @@ function Quotable:NewQuoteUpdateCharsRemaining()
 end
 
 function Quotable:NewQuoteSubmit()
-
+    local new_quote = {
+        quote = Quotable.add_form.input_quote:GetText(),
+        author = Quotable.add_form.input_author:GetText(),
+        date = Quotable.add_form.input_date:GetText()
+    }
+    -- TODO: Serialize tags, separated by commas
+    table.insert(Quotable.db.global.quotes, new_quote)
 end
