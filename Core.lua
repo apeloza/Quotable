@@ -40,7 +40,13 @@ local options = {
             type="execute",
             name="List Quotes",
             desc = "Lists all quotes by name",
-            func="ListQuotes"
+            func="ListQuotes",
+        },
+        show = {
+            type="execute",
+            name="Show",
+            desc = "Opens the Quotable window.",
+            func="Show",
         }
     },
 }
@@ -149,7 +155,7 @@ end
 
 function Quotable:SetOutput(info, newValue)
     Quotable.db.global.channel = newValue;
-    Quotable.channelHeading:SetText('Channel: ' .. newValue);
+    Quotable.channel_heading:SetText('Channel: ' .. newValue);
 end
 
 function Quotable:ListQuotes(info)
@@ -160,12 +166,18 @@ function Quotable:ListQuotes(info)
     Quotable:Print(table.concat(quote_list, ", "))
 end
 
+function Quotable:Show()
+    if(Quotable.main_frame == nil) then
+        Quotable:DrawMainFrame();
+    end
+end
+
 --called to draw the frame into existence/update the frame as needed
 function Quotable:DrawMainFrame()
     local AceGUI = LibStub("AceGUI-3.0")
     -- Create a container frame
     local f = AceGUI:Create("Frame")
-    f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
+    f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) Quotable.main_frame = nil end)
     f:SetTitle("Quotable")
     f:SetLayout("List")
     f:SetWidth(250);
@@ -198,7 +210,8 @@ function Quotable:DrawMainFrame()
     currentChannel:SetRelativeWidth(.9);
     currentChannel:SetText('Channel: ' .. Quotable.db.global.channel);
     f:AddChild(currentChannel);
-    Quotable.channelHeading = currentChannel;
+    Quotable.channel_heading = currentChannel;
+    Quotable.main_frame = f;
 end
 
 --DESTRUCTIVE
