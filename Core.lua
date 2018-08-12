@@ -56,6 +56,8 @@ function Quotable:OnEnable()
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Quotable", options, {"quotable", "quote"})
 
     Quotable.DrawMainFrame();
+    Quotable:RegisterEvent("PLAYER_LOGOUT", Quotable.SetFrameLocation);
+
 end
 
 
@@ -64,6 +66,9 @@ function Quotable:OnInitialize()
     local defaults = {
         global = {
             channel = 'PARTY',
+            position = 'CENTER',
+            xOfs = 0,
+            yOfs = 0,
             quotes = {
                 {
                     name = "Tigers",
@@ -172,6 +177,13 @@ function Quotable:Show()
     end
 end
 
+function Quotable:SetFrameLocation()
+    local point, relativeTo, relativePoint, xOfs, yOfs = Quotable.main_frame:GetPoint()
+    Quotable.db.global.position  = point;
+    Quotable.db.global.xOfs = xOfs;
+    Quotable.db.global.yOfs = yOfs;
+end
+
 --called to draw the frame into existence/update the frame as needed
 function Quotable:DrawMainFrame()
     local AceGUI = LibStub("AceGUI-3.0")
@@ -188,7 +200,6 @@ function Quotable:DrawMainFrame()
     btn:SetText("Random!");
     f:SetStatusText("v.0.1")
     btn:SetCallback("OnClick", Quotable.Speak)
-    btn:SetPoint('CENTER', 20, 50);
     -- Add the button to the container
     f:AddChild(btn);
 
@@ -212,6 +223,8 @@ function Quotable:DrawMainFrame()
     f:AddChild(currentChannel);
     Quotable.channel_heading = currentChannel;
     Quotable.main_frame = f;
+    --TODO: Snap to saved position here
+    --f:SetPoint(Quotable.db.global.position, nil, nil, Quotable.db.global.xOfs, Quotable.db.global.yOfs);
 end
 
 --DESTRUCTIVE
