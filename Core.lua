@@ -407,10 +407,16 @@ function Quotable:ManageQuotesOpenWindow()
     local header_quote = AceGUI:Create("Label")
     header_quote:SetText("Quote")
     header_quote:SetColor(1, .756, .145)
-    header_quote:SetRelativeWidth(.95)
+    header_quote:SetRelativeWidth(.5)
+
+    local header_author = AceGUI:Create("Label")
+    header_author:SetText("Author")
+    header_author:SetColor(1, .756, .145)
+    header_author:SetRelativeWidth(.45)
 
     header_container:AddChild(header_number)
     header_container:AddChild(header_quote)
+    header_container:AddChild(header_author)
 
     -- Quote list
     local scroll_container = AceGUI:Create("SimpleGroup")
@@ -418,8 +424,21 @@ function Quotable:ManageQuotesOpenWindow()
     scroll_container:SetHeight(220)
     scroll_container:SetLayout("Fill")
 
+    Quotable.db.global.manage_quotes = {scroll_container = scroll_container}
+
+    Quotable:ManageQuotesPopulateQuoteList()
+
+    f:AddChild(header_container)
+    f:AddChild(scroll_container)
+end
+
+function Quotable:ManageQuotesPopulateQuoteList()
+    local AceGUI = LibStub("AceGUI-3.0")
+
+    Quotable.db.global.manage_quotes.scroll_container:ReleaseChildren()
+
     local scroll = AceGUI:Create("ScrollFrame")
-    scroll_container:AddChild(scroll)
+    Quotable.db.global.manage_quotes.scroll_container:AddChild(scroll)
 
     -- Add quotes to list
     for i, q in ipairs(Quotable.db.global.quotes) do
@@ -433,7 +452,11 @@ function Quotable:ManageQuotesOpenWindow()
 
         local label_quote = AceGUI:Create("Label")
         label_quote:SetText(q.quote)
-        label_quote:SetRelativeWidth(.7)
+        label_quote:SetRelativeWidth(.5)
+
+        local label_author = AceGUI:Create("Label")
+        label_author:SetText(q.author)
+        label_author:SetRelativeWidth(.2)
 
         local edit_btn = AceGUI:Create("Button")
         edit_btn:SetText("Edit")
@@ -442,17 +465,21 @@ function Quotable:ManageQuotesOpenWindow()
         local delete_btn = AceGUI:Create("Button")
         delete_btn:SetText("Del")
         delete_btn:SetRelativeWidth(.125)
+        delete_btn:SetCallback("OnClick", function() Quotable:DeleteQuote(i) end)
 
         row:AddChild(label_number)
         row:AddChild(label_quote)
+        row:AddChild(label_author)
         row:AddChild(edit_btn)
         row:AddChild(delete_btn)
 
         scroll:AddChild(row)
     end
+end
 
-    f:AddChild(header_container)
-    f:AddChild(scroll_container)
+function Quotable:DeleteQuote(id)
+    table.remove(Quotable.db.global.quotes, id)
+    Quotable:ManageQuotesPopulateQuoteList()
 end
 
 ------------------------
