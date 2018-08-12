@@ -176,49 +176,63 @@ function Quotable:DrawMainFrame()
     local AceGUI = LibStub("AceGUI-3.0")
     -- Create a container frame
     local f = AceGUI:Create("Frame")
-    f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) Quotable.main_frame = nil end)
+    f:SetCallback("OnClose", Quotable.OnMainFrameClose)
     f:SetTitle("Quotable")
     f:SetLayout("List")
     f:SetWidth(250);
     f:SetHeight(400);
-    -- Create a button
-    local btn = AceGUI:Create("Button");
-    btn:SetRelativeWidth(0.8);
-    btn:SetText("Random!");
     f:SetStatusText("v.0.1")
+    f:EnableResize(false)
+
+    -- Random! Button
+    local btn = AceGUI:Create("Button");
+    btn:SetFullWidth(true);
+    btn:SetText("Random!");
     btn:SetCallback("OnClick", Quotable.Speak)
-    -- Add the button to the container
     f:AddChild(btn);
 
+    -- Current channel divider
+    local currentChannel = AceGUI:Create("Heading");
+    currentChannel:SetFullWidth(true);
+    currentChannel:SetText('Channel: ' .. Quotable.db.global.channel);
+    f:AddChild(currentChannel);
+    Quotable.channel_heading = currentChannel;
+
     -- New Quote
-    local add_btn = AceGUI:Create("Button")
-    add_btn:SetWidth(170)
-    add_btn:SetText("New Quote")
-    add_btn:SetCallback("OnClick", Quotable.NewQuoteOpenWindow)
-    f:AddChild(add_btn)
+    local btn_new = AceGUI:Create("Button")
+    btn_new:SetFullWidth(true);
+    btn_new:SetText("New Quote")
+    btn_new:SetCallback("OnClick", Quotable.NewQuoteOpenWindow)
+    f:AddChild(btn_new)
 
     -- Manage Quotes
-    local add_btn = AceGUI:Create("Button")
-    add_btn:SetWidth(170)
-    add_btn:SetText("Manage Quotes")
-    add_btn:SetCallback("OnClick", Quotable.ManageQuotesOpenWindow)
-    f:AddChild(add_btn)
+    local btn_manage = AceGUI:Create("Button")
+    btn_manage:SetFullWidth(true);
+    btn_manage:SetText("Manage")
+    btn_manage:SetCallback("OnClick", Quotable.ManageQuotesOpenWindow)
+    f:AddChild(btn_manage)
 
+    -- Change output channel
     local channelDropdown = AceGUI:Create("Dropdown");
     local channelOptions = {PARTY = 'Party', RAID = 'Raid', GUILD = 'Guild'};
-    channelDropdown:SetWidth(170);
+    channelDropdown:SetFullWidth(true);
     channelDropdown:SetList(channelOptions);
     channelDropdown:SetLabel('Output Channel');
     channelDropdown:SetCallback("OnValueChanged", Quotable.SetOutput)
     f:AddChild(channelDropdown);
-    local currentChannel = AceGUI:Create("Heading");
-    currentChannel:SetRelativeWidth(.9);
-    currentChannel:SetText('Channel: ' .. Quotable.db.global.channel);
-    f:AddChild(currentChannel);
-    Quotable.channel_heading = currentChannel;
+
     Quotable.main_frame = f;
-    --TODO: Snap to saved position here
-    --f:SetPoint(Quotable.db.global.position, nil, nil, Quotable.db.global.xOfs, Quotable.db.global.yOfs);
+
+    -- Snap frame to saved position
+    f:SetPoint(Quotable.db.global.position, Quotable.db.global.xOfs, Quotable.db.global.yOfs);
+end
+
+function Quotable:OnMainFrameClose()
+    local AceGUI = LibStub("AceGUI-3.0")
+
+    Quotable.SetFrameLocation()
+    AceGUI:Release(Quotable.main_frame)
+    Quotable.main_frame = nil
 end
 
 --DESTRUCTIVE
