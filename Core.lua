@@ -46,8 +46,32 @@ local options = {
 function Quotable:OnEnable()
     Quotable:Print("Welcome to Quotable! /quote or /quotable to use.");
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Quotable", options, {"quotable", "quote"})
-    -- declare defaults to be used in the DB
+
+    local AceGUI = LibStub("AceGUI-3.0")
+    -- Create a container frame
+    local f = AceGUI:Create("Frame")
+    f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
+    f:SetTitle("Quotable")
+    f:SetLayout("Flow")
+    -- Create a button
+    local btn = AceGUI:Create("Button")
+    btn:SetWidth(170)
+    btn:SetText("Output a quote!")
+    f:SetStatusText("Quotable v 0.1")
+    btn:SetCallback("OnClick", Quotable.Speak)
+    -- Add the button to the container
+    f:AddChild(btn)
+    local channelDropdown = AceGUI:Create("Dropdown");
+    local channelOptions = {'PARTY', 'RAID'};
+    channelDropdown:SetWidth(170);
+    channelDropdown:SetList(channelOptions);
+    channelDropdown:SetLabel('Output Channel');
+    channelDropdown:SetCallback("OnValueChanged", Quotable.SetOutput)
+    f:AddChild(channelDropdown);
+
+
 end
+
 
 function Quotable:OnInitialize()
     -- Database setup
@@ -144,6 +168,7 @@ function Quotable:ParseQuoteInput(input)
 end
 
 function Quotable:SetOutput(info, newValue)
+    Quotable:Print(newValue);
     Quotable.db.global.channel = newValue;
 end
 
