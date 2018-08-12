@@ -47,28 +47,7 @@ function Quotable:OnEnable()
     Quotable:Print("Welcome to Quotable! /quote or /quotable to use.");
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Quotable", options, {"quotable", "quote"})
 
-    local AceGUI = LibStub("AceGUI-3.0")
-    -- Create a container frame
-    local f = AceGUI:Create("Frame")
-    f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
-    f:SetTitle("Quotable")
-    f:SetLayout("Flow")
-    -- Create a button
-    local btn = AceGUI:Create("Button")
-    btn:SetWidth(170)
-    btn:SetText("Output a quote!")
-    f:SetStatusText("Quotable v 0.1")
-    btn:SetCallback("OnClick", Quotable.Speak)
-    -- Add the button to the container
-    f:AddChild(btn)
-    local channelDropdown = AceGUI:Create("Dropdown");
-    local channelOptions = {PARTY = 'Party', RAID = 'Raid', GUILD = 'Guild'};
-    channelDropdown:SetWidth(170);
-    channelDropdown:SetList(channelOptions);
-    channelDropdown:SetLabel('Output Channel');
-    channelDropdown:SetCallback("OnValueChanged", Quotable.SetOutput)
-    f:AddChild(channelDropdown);
-
+    Quotable.DrawMainFrame();
 
 end
 
@@ -168,8 +147,8 @@ function Quotable:ParseQuoteInput(input)
 end
 
 function Quotable:SetOutput(info, newValue)
-    Quotable:Print(newValue);
     Quotable.db.global.channel = newValue;
+    Quotable.channelHeading:SetText('Channel: ' .. newValue);
 end
 
 function Quotable:ListQuotes(info)
@@ -178,6 +157,39 @@ function Quotable:ListQuotes(info)
         table.insert(quote_list, Quotable.db.global.quotes[i].name)
     end
     Quotable:Print(table.concat(quote_list, ", "))
+end
+
+--called to draw the frame into existence/update the frame as needed
+function Quotable:DrawMainFrame()
+    local AceGUI = LibStub("AceGUI-3.0")
+    -- Create a container frame
+    local f = AceGUI:Create("Frame")
+    f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
+    f:SetTitle("Quotable")
+    f:SetLayout("List")
+    f:SetWidth(250);
+    f:SetHeight(400);
+    -- Create a button
+    local btn = AceGUI:Create("Button");
+    btn:SetRelativeWidth(0.8);
+    btn:SetText("Random!");
+    f:SetStatusText("v.0.1")
+    btn:SetCallback("OnClick", Quotable.Speak)
+    btn:SetPoint('CENTER', 20, 50);
+    -- Add the button to the container
+    f:AddChild(btn);
+    local channelDropdown = AceGUI:Create("Dropdown");
+    local channelOptions = {PARTY = 'Party', RAID = 'Raid', GUILD = 'Guild'};
+    channelDropdown:SetWidth(170);
+    channelDropdown:SetList(channelOptions);
+    channelDropdown:SetLabel('Output Channel');
+    channelDropdown:SetCallback("OnValueChanged", Quotable.SetOutput)
+    f:AddChild(channelDropdown);
+    local currentChannel = AceGUI:Create("Heading");
+    currentChannel:SetRelativeWidth(.9);
+    currentChannel:SetText('Channel: ' .. Quotable.db.global.channel);
+    f:AddChild(currentChannel);
+    Quotable.channelHeading = currentChannel;
 end
 
 --DESTRUCTIVE
