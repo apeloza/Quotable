@@ -62,7 +62,7 @@ function Quotable:OnEnable()
     -- Add the button to the container
     f:AddChild(btn)
     local channelDropdown = AceGUI:Create("Dropdown");
-    local channelOptions = {'PARTY', 'RAID'};
+    local channelOptions = {PARTY = 'Party', RAID = 'Raid', GUILD = 'Guild'};
     channelDropdown:SetWidth(170);
     channelDropdown:SetList(channelOptions);
     channelDropdown:SetLabel('Output Channel');
