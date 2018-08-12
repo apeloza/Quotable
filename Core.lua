@@ -81,17 +81,17 @@ function Quotable:Speak(info)
         local quote = Quotable.Random()
         local format = ""
 
-        if quote.author and quote.date then
+        if Quotable:is_present(quote.author) and Quotable:is_present(quote.date) then
             format = "\"{quote}\" - {author}, {date}"
-        elseif quote.author then
+        elseif Quotable:is_present(quote.author) then
             format = "\"{quote}\" - {author}"
-        elseif quote.date then
+        elseif Quotable:is_present(quote.date) then
             format = "\"{quote}\" - {date}"
         else
             format = "\"{quote}\""
         end
 
-        local formatted_quote = replace_vars(format, quote)
+        local formatted_quote = Quotable:replace_vars(format, quote)
         SendChatMessage(formatted_quote, Quotable.db.global.channel);
     else
         Quotable:Print('ERROR: No quotes are in the database. Use /quote save to add quotes!');
@@ -401,7 +401,7 @@ end
 --- UTILITY FUNCTIONS
 ------------------------
 
-function replace_vars(str, vars)
+function Quotable:replace_vars(str, vars)
     -- Allow replace_vars{str, vars} syntax as well as replace_vars(str, {vars})
     if not vars then
         vars = str
@@ -411,4 +411,8 @@ function replace_vars(str, vars)
         function(whole,i)
             return vars[i] or whole
         end))
+end
+
+function Quotable:is_present(str)
+    return str ~= nil and str ~= ''
 end
