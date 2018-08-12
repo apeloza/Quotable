@@ -8,40 +8,6 @@ local options = {
     handler = Quotable,
     type = 'group',
     args = {
-        speak = {
-            type = "execute",
-            name = "Speak",
-            desc = "Outputs a random quote.",
-            func = "Speak"
-        },
-        save = {
-            type="input",
-            name="Save",
-            desc = "Saves a new quote to the database.",
-            get="Save",
-            set="Save",
-            usage = "/quote save <name> <quote>",
-            validate = "ValidateQuote",
-        },
-        output = {
-            type="input",
-            name="Output",
-            desc = "Sets the output channel for Quotable (default party).",
-            get="SetOutput",
-            set="SetOutput",
-        },
-        eraseall = {
-            type="execute",
-            name="Erase All",
-            desc = "Erases ALL quotes in the database (WARNING: permanent!)",
-            func="EraseAll",
-        },
-        list = {
-            type="execute",
-            name="List Quotes",
-            desc = "Lists all quotes by name",
-            func="ListQuotes",
-        },
         show = {
             type="execute",
             name="Show",
@@ -52,9 +18,7 @@ local options = {
 }
 
 function Quotable:OnEnable()
-    Quotable:Print("Welcome to Quotable! /quote or /quotable to use.");
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Quotable", options, {"quotable", "quote"})
-
     Quotable.DrawMainFrame();
     Quotable:RegisterEvent("PLAYER_LOGOUT", Quotable.SetFrameLocation);
 
@@ -260,6 +224,7 @@ end
 --DESTRUCTIVE
 function Quotable:EraseAll(info)
     Quotable.db.global.quotes = {};
+    Quotable:ManageQuotesPopulateQuoteList();
 end
 
 -- Returns a list of unique quote authors as keys
@@ -372,6 +337,7 @@ function Quotable:NewQuoteSubmit()
     }
     -- TODO: Serialize tags, separated by commas
     table.insert(Quotable.db.global.quotes, new_quote)
+    Quotable:ManageQuotesPopulateQuoteList();
     Quotable:Print("Quote saved!")
     -- TODO: Programmatically close form
 end
@@ -424,12 +390,19 @@ function Quotable:ManageQuotesOpenWindow()
     scroll_container:SetHeight(220)
     scroll_container:SetLayout("Fill")
 
+    -- Delete All Button
+    local delete_all = AceGUI:Create("Button");
+    delete_all:SetText("Delete All")
+    delete_all:SetRelativeWidth(.225)
+    delete_all:SetCallback("OnClick", Quotable.EraseAll);
+
     Quotable.db.global.manage_quotes = {scroll_container = scroll_container}
 
     Quotable:ManageQuotesPopulateQuoteList()
 
     f:AddChild(header_container)
     f:AddChild(scroll_container)
+    f:AddChild(delete_all)
 end
 
 function Quotable:ManageQuotesPopulateQuoteList()
