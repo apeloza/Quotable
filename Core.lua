@@ -203,11 +203,18 @@ function Quotable:DrawMainFrame()
     -- Add the button to the container
     f:AddChild(btn);
 
-    -- create the add button
+    -- New Quote
     local add_btn = AceGUI:Create("Button")
     add_btn:SetWidth(170)
     add_btn:SetText("New Quote")
     add_btn:SetCallback("OnClick", Quotable.NewQuoteOpenWindow)
+    f:AddChild(add_btn)
+
+    -- Manage Quotes
+    local add_btn = AceGUI:Create("Button")
+    add_btn:SetWidth(170)
+    add_btn:SetText("Manage Quotes")
+    add_btn:SetCallback("OnClick", Quotable.ManageQuotesOpenWindow)
     f:AddChild(add_btn)
 
     local channelDropdown = AceGUI:Create("Dropdown");
@@ -320,4 +327,85 @@ function Quotable:NewQuoteSubmit()
     }
     -- TODO: Serialize tags, separated by commas
     table.insert(Quotable.db.global.quotes, new_quote)
+    Quotable:Print("Quote saved!")
+    -- TODO: Programmatically close form
+end
+
+---------------------------
+-- MODULE: MANAGE QUOTES
+---------------------------
+
+function Quotable:ManageQuotesOpenWindow()
+    local AceGUI = LibStub("AceGUI-3.0")
+
+    -- Create a container frame
+    local f = AceGUI:Create("Frame")
+    f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
+    f:SetTitle("Manage Quotes")
+    f:SetLayout("List")
+    f:SetHeight(300)
+    f:SetWidth(500)
+    f:EnableResize(false)
+
+    -- TODO: Search bar
+
+    local header_container = AceGUI:Create("SimpleGroup")
+    header_container:SetFullWidth(true)
+    header_container:SetHeight(20)
+    header_container:SetLayout("Flow")
+
+    local header_number = AceGUI:Create("Label")
+    header_number:SetText("#")
+    header_number:SetColor(1, .756, .145)
+    header_number:SetRelativeWidth(.05)
+
+    local header_quote = AceGUI:Create("Label")
+    header_quote:SetText("Quote")
+    header_quote:SetColor(1, .756, .145)
+    header_quote:SetRelativeWidth(.95)
+
+    header_container:AddChild(header_number)
+    header_container:AddChild(header_quote)
+
+    -- Quote list
+    local scroll_container = AceGUI:Create("SimpleGroup")
+    scroll_container:SetFullWidth(true)
+    scroll_container:SetHeight(220)
+    scroll_container:SetLayout("Fill")
+
+    local scroll = AceGUI:Create("ScrollFrame")
+    scroll_container:AddChild(scroll)
+
+    -- Add quotes to list
+    for i, q in ipairs(Quotable.db.global.quotes) do
+        local row = AceGUI:Create("SimpleGroup")
+        row:SetLayout("Flow")
+        row:SetFullWidth(true)
+
+        local label_number = AceGUI:Create("Label")
+        label_number:SetText(i)
+        label_number:SetRelativeWidth(.05)
+
+        local label_quote = AceGUI:Create("Label")
+        label_quote:SetText(q.quote)
+        label_quote:SetRelativeWidth(.7)
+
+        local edit_btn = AceGUI:Create("Button")
+        edit_btn:SetText("Edit")
+        edit_btn:SetRelativeWidth(.125)
+
+        local delete_btn = AceGUI:Create("Button")
+        delete_btn:SetText("Del")
+        delete_btn:SetRelativeWidth(.125)
+
+        row:AddChild(label_number)
+        row:AddChild(label_quote)
+        row:AddChild(edit_btn)
+        row:AddChild(delete_btn)
+
+        scroll:AddChild(row)
+    end
+
+    f:AddChild(header_container)
+    f:AddChild(scroll_container)
 end
