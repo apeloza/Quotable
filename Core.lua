@@ -76,10 +76,16 @@ function Quotable:OnInitialize()
     Quotable.db = LibStub("AceDB-3.0"):New("QuotableDB", defaults, true);
 end
 
-function Quotable:Speak(info)
+function Quotable:Speak(author)
     if(#Quotable.db.global.quotes ~= 0) then
-        local quote = Quotable.Random()
-        local format = ""
+        local quote, format
+
+        -- Check for author (will be passed as event/"OnClick" if there is no author)
+        if author and author ~= "OnClick" then
+            quote = Quotable:Random(author)
+        else
+            quote = Quotable:Random()
+        end
 
         if Quotable:is_present(quote.author) and Quotable:is_present(quote.date) then
             format = "\"{quote}\" - {author}, {date}"
@@ -99,9 +105,15 @@ function Quotable:Speak(info)
 end
 
 --Returns a random quote from the quote DB
-function Quotable:Random()
-    local number = math.random(#Quotable.db.global.quotes);
-    return Quotable.db.global.quotes[number];
+function Quotable:Random(author)
+    local db
+    if author then
+        db = Quotable:GetAuthorQuotes(author)
+    else
+        db = Quotable.db.global.quotes
+    end
+    local number = math.random(#db)
+    return db[number];
 end
 
 function Quotable:Save(info, input)
@@ -187,9 +199,19 @@ function Quotable:DrawMainFrame()
     -- Random! Button
     local btn = AceGUI:Create("Button");
     btn:SetFullWidth(true);
-    btn:SetText("Random!");
+    btn:SetText("Random Quote!");
     btn:SetCallback("OnClick", Quotable.Speak)
     f:AddChild(btn);
+
+    -- Per-author buttons
+    local authors = Quotable:GetAuthors()
+    for author, _ in pairs(authors) do
+        local btn_author = AceGUI:Create("Button")
+        btn_author:SetFullWidth(true)
+        btn_author:SetText("Random From: " .. author)
+        btn_author:SetCallback("OnClick", function() Quotable:Speak(author) end)
+        f:AddChild(btn_author)
+    end
 
     -- Current channel divider
     local currentChannel = AceGUI:Create("Heading");
@@ -208,7 +230,7 @@ function Quotable:DrawMainFrame()
     -- Manage Quotes
     local btn_manage = AceGUI:Create("Button")
     btn_manage:SetFullWidth(true);
-    btn_manage:SetText("Manage")
+    btn_manage:SetText("Manage Quotes")
     btn_manage:SetCallback("OnClick", Quotable.ManageQuotesOpenWindow)
     f:AddChild(btn_manage)
 
@@ -238,6 +260,28 @@ end
 --DESTRUCTIVE
 function Quotable:EraseAll(info)
     Quotable.db.global.quotes = {};
+end
+
+-- Returns a list of unique quote authors as keys
+function Quotable:GetAuthors()
+    local authors = {}
+    for _, v in pairs(Quotable.db.global.quotes) do
+        if v.author ~= nil and v.author ~= "" then
+            authors[v.author] = true
+        end
+    end
+    return authors
+end
+
+-- Returns all quotes by a specific author
+function Quotable:GetAuthorQuotes(author)
+    local quotes = {}
+    for _, v in pairs(Quotable.db.global.quotes) do
+        if v.author == author then
+            table.insert(quotes, v)
+        end
+    end
+    return quotes
 end
 
 -----------------------
