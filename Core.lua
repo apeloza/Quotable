@@ -1,6 +1,8 @@
 -- Create a new Ace3 module
 Quotable = LibStub("AceAddon-3.0"):NewAddon("Quotable", "AceConsole-3.0", "AceEvent-3.0", "AceComm-3.0");
 
+local MAX_QUOTE_LENGTH = 200
+
 local options = {
     name = "Quotable",
     handler = Quotable,
@@ -48,7 +50,6 @@ function Quotable:OnEnable()
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Quotable", options, {"quotable", "quote"})
 
     Quotable.DrawMainFrame();
-
 end
 
 
@@ -178,6 +179,14 @@ function Quotable:DrawMainFrame()
     btn:SetPoint('CENTER', 20, 50);
     -- Add the button to the container
     f:AddChild(btn);
+
+    -- create the add button
+    local add_btn = AceGUI:Create("Button")
+    add_btn:SetWidth(170)
+    add_btn:SetText("New Quote")
+    add_btn:SetCallback("OnClick", Quotable.NewQuoteOpenWindow)
+    f:AddChild(add_btn)
+
     local channelDropdown = AceGUI:Create("Dropdown");
     local channelOptions = {PARTY = 'Party', RAID = 'Raid', GUILD = 'Guild'};
     channelDropdown:SetWidth(170);
@@ -195,4 +204,88 @@ end
 --DESTRUCTIVE
 function Quotable:EraseAll(info)
     Quotable.db.global.quotes = {};
+end
+
+-----------------------
+-- MODULE: NEW QUOTE
+-----------------------
+
+function Quotable:NewQuoteOpenWindow()
+    local AceGUI = LibStub("AceGUI-3.0")
+
+    Quotable.add_form = {}
+
+    -- Create a container frame
+    local f = AceGUI:Create("Frame")
+    f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
+    f:SetTitle("New Quote")
+    f:SetLayout("List")
+    f:SetHeight(300)
+    f:SetWidth(500)
+    f:EnableResize(false)
+
+    -- Input: Quote
+    local input_quote = AceGUI:Create("MultiLineEditBox")
+    input_quote:SetLabel("Quote (Required)")
+    input_quote:SetNumLines(3)
+    input_quote:SetMaxLetters(200)
+    input_quote:DisableButton(true)
+    input_quote:SetRelativeWidth(1)
+
+    input_quote:SetCallback("OnTextChanged", Quotable.NewQuoteUpdateCharsRemaining)
+
+    f:AddChild(input_quote)
+
+    -- Characters remaining
+    local chars_remaining = AceGUI:Create("Label")
+    chars_remaining:SetText(MAX_QUOTE_LENGTH .. " characters remaining")
+    chars_remaining:SetRelativeWidth(1)
+    f:AddChild(chars_remaining)
+
+    -- Author + date container
+    local details = AceGUI:Create("SimpleGroup")
+    details:SetLayout("Flow")
+    details:SetRelativeWidth(1)
+
+    local input_author = AceGUI:Create("EditBox")
+    input_author:SetLabel("Author")
+    input_author:SetRelativeWidth(.5)
+
+    local input_date = AceGUI:Create("EditBox")
+    input_date:SetLabel("Date")
+    input_date:SetRelativeWidth(.5)
+
+    details:AddChild(input_author)
+    details:AddChild(input_date)
+    f:AddChild(details)
+
+    -- Tags
+    local input_tags = AceGUI:Create("EditBox")
+    input_tags:SetLabel("Tags")
+    input_tags:SetRelativeWidth(1)
+    f:AddChild(input_tags)
+
+    -- Submit Button
+    local submit = AceGUI:Create("Button")
+    submit:SetText("Save")
+    submit:SetWidth(200)
+
+    f:AddChild(submit)
+
+    Quotable.add_form.input_quote = input_quote;
+    Quotable.add_form.chars_remaining = chars_remaining;
+    Quotable.add_form.input_author = input_author;
+    Quotable.add_form.input_date = input_date;
+
+    input_quote:SetFocus()
+end
+
+function Quotable:NewQuoteUpdateCharsRemaining()
+    local char_count = #Quotable.add_form.input_quote:GetText()
+    local remaining_char_count = MAX_QUOTE_LENGTH - char_count
+    Quotable.add_form.chars_remaining:SetText(remaining_char_count .. " characters remaining")
+end
+
+function Quotable:NewQuoteSubmit()
+
 end
