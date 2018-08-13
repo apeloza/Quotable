@@ -319,7 +319,7 @@ function Quotable:NewQuoteOpenWindow()
     submit:SetCallback("OnClick", Quotable.NewQuoteSubmit)
     f:AddChild(submit)
 
-    Quotable.add_form = f;
+    Quotable.add_form.f = f;
     Quotable.add_form.input_quote = input_quote;
     Quotable.add_form.chars_remaining = chars_remaining;
     Quotable.add_form.input_author = input_author;
@@ -342,9 +342,18 @@ function Quotable:NewQuoteSubmit()
     }
     -- TODO: Serialize tags, separated by commas
     table.insert(Quotable.db.global.quotes, new_quote)
-    Quotable:Print("Quote saved!");
-    -- TODO: Programmatically close form
-    Quotable:ManageQuotesPopulateQuoteList();
+
+    -- TODO: Re-enable once managequotes is fixed
+    -- Quotable:ManageQuotesPopulateQuoteList()
+
+    Quotable:Print("Quote saved!")
+    Quotable:NewQuoteClose()
+end
+
+function Quotable:NewQuoteClose()
+    local AceGUI = LibStub("AceGUI-3.0")
+    AceGUI:Release(Quotable.add_form.f)
+    Quotable.add_form.f = nil
 end
 
 
@@ -411,10 +420,13 @@ function Quotable:ManageQuotesOpenWindow()
     f:AddChild(delete_all)
 end
 
+-- TODO: Only populate/run this if the managequotes window is open
 function Quotable:ManageQuotesPopulateQuoteList()
     local AceGUI = LibStub("AceGUI-3.0")
 
-    Quotable.db.global.manage_quotes.scroll_container:ReleaseChildren()
+    if Quotable.db.global.manage_quotes.scroll_container then
+        Quotable.db.global.manage_quotes.scroll_container:ReleaseChildren()
+    end
 
     local scroll = AceGUI:Create("ScrollFrame")
     Quotable.db.global.manage_quotes.scroll_container:AddChild(scroll)
