@@ -319,6 +319,7 @@ function Quotable:NewQuoteOpenWindow()
     submit:SetCallback("OnClick", Quotable.NewQuoteSubmit)
     f:AddChild(submit)
 
+    Quotable.add_form = f;
     Quotable.add_form.input_quote = input_quote;
     Quotable.add_form.chars_remaining = chars_remaining;
     Quotable.add_form.input_author = input_author;
@@ -341,10 +342,11 @@ function Quotable:NewQuoteSubmit()
     }
     -- TODO: Serialize tags, separated by commas
     table.insert(Quotable.db.global.quotes, new_quote)
-    Quotable:ManageQuotesPopulateQuoteList();
-    Quotable:Print("Quote saved!")
+    Quotable:Print("Quote saved!");
     -- TODO: Programmatically close form
+    Quotable:ManageQuotesPopulateQuoteList();
 end
+
 
 ---------------------------
 -- MODULE: MANAGE QUOTES
