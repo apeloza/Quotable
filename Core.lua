@@ -203,6 +203,7 @@ function Quotable:DrawMainFrame()
     local channelOptions = {PARTY = 'Party', RAID = 'Raid', GUILD = 'Guild'};
     channelDropdown:SetFullWidth(true);
     channelDropdown:SetList(channelOptions);
+    channelDropdown:SetText(channelOptions[Quotable.db.global.channel]);
     channelDropdown:SetLabel('Output Channel');
     channelDropdown:SetCallback("OnValueChanged", Quotable.SetOutput)
     f:AddChild(channelDropdown);
