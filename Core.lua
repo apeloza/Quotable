@@ -177,26 +177,19 @@ function Quotable:DrawMainFrame()
         f:AddChild(btn_author)
     end
 
-    -- Current channel divider
-    local currentChannel = AceGUI:Create("Heading");
-    currentChannel:SetFullWidth(true);
-    currentChannel:SetText('Channel: ' .. Quotable.db.global.channel);
-    f:AddChild(currentChannel);
-    Quotable.channel_heading = currentChannel;
+
 
     -- New Quote
     local btn_new = AceGUI:Create("Button")
     btn_new:SetFullWidth(true);
     btn_new:SetText("New Quote")
     btn_new:SetCallback("OnClick", Quotable.NewQuoteOpenWindow)
-    f:AddChild(btn_new)
 
     -- Manage Quotes
     local btn_manage = AceGUI:Create("Button")
     btn_manage:SetFullWidth(true);
     btn_manage:SetText("Manage Quotes")
     btn_manage:SetCallback("OnClick", Quotable.ManageQuotesOpenWindow)
-    f:AddChild(btn_manage)
 
     -- Change output channel
     local channelDropdown = AceGUI:Create("Dropdown");
@@ -206,7 +199,17 @@ function Quotable:DrawMainFrame()
     channelDropdown:SetText(channelOptions[Quotable.db.global.channel]);
     channelDropdown:SetLabel('Output Channel');
     channelDropdown:SetCallback("OnValueChanged", Quotable.SetOutput)
+
+    -- Current channel divider
+    local currentChannel = AceGUI:Create("Heading");
+    currentChannel:SetFullWidth(true);
+    currentChannel:SetText('Channel: ' .. channelOptions[Quotable.db.global.channel]);
+    f:AddChild(currentChannel);
+    f:AddChild(btn_new);
+    f:AddChild(btn_manage);
     f:AddChild(channelDropdown);
+
+    Quotable.channel_heading = currentChannel;
 
     Quotable.main_frame = f;
 
